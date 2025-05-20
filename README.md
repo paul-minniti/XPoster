@@ -14,7 +14,9 @@ Getting Quick GPT Reply is simple! Just follow these steps:
 
 **Method 1: From the Official Extension Store (Recommended)**
 
-1.  **Open your Browser's Extension Store:**
+**Coming Soon**
+
+<!-- 1.  **Open your Browser's Extension Store:**
     - For **Google Chrome:** Go to the [Chrome Web Store](https://chrome.google.com/webstore)
     - For **Mozilla Firefox:** Go to [Firefox Add-ons](https://addons.mozilla.org/)
     - For **Microsoft Edge:** Go to [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home)
@@ -22,7 +24,7 @@ Getting Quick GPT Reply is simple! Just follow these steps:
 2.  **Search for "Quick GPT Reply".**
 3.  **Click "Add to [Your Browser]"** (e.g., "Add to Chrome").
 4.  **Confirm Installation:** A pop-up might ask for permissions. Click "Add extension".
-5.  That's it! You should see a confirmation, and the extension is ready to use.
+5.  That's it! You should see a confirmation, and the extension is ready to use. -->
 
 **Method 2: Manual Installation (If provided by the developer)**
 
