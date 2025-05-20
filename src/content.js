@@ -136,7 +136,8 @@ function handleQuickReplyClick(event) {
 
             if (response && response.success) {
               console.log("Quick GPT Reply received:", response.reply);
-              injectReply(tweetElement, response.reply);
+              // Pass original tweet text (tweetData.text) to injectReply for the regenerate button
+              injectReply(tweetElement, response.reply, tweetData.text);
               // Reset after successful injection (or if injectReply handles its own errors and button state)
               resetButton(
                 button,
@@ -444,7 +445,11 @@ function extractTweetContext(tweetElement) {
 }
 
 // Function to populate the reply box (Subtask 5.4)
-async function injectReply(tweetElement, replyText) {
+async function injectReply(
+  tweetElement,
+  replyText,
+  originalTweetTextForRegeneration
+) {
   try {
     if (!tweetElement || !replyText) {
       console.error(
@@ -587,6 +592,56 @@ async function injectReply(tweetElement, replyText) {
         );
         // We are relying on the dispatched events to enable the button naturally.
         // If still disabled, the events were not sufficient to update X.com's component state.
+
+        // --- START: Added for Task 12 (Regenerate Button UI) ---
+        // Check if a regenerate button already exists to avoid duplicates
+        if (!tweetModal.querySelector(".quick-gpt-regenerate-button")) {
+          const regenerateButton = createRegenerateButton(
+            tweetModal,
+            replyTextarea,
+            originalTweetTextForRegeneration
+          ); // Use passed originalTweetText
+
+          // New placement: Next to the main reply button
+          const replyButtonContainer = modalPostButton.parentElement;
+          if (replyButtonContainer) {
+            replyButtonContainer.insertBefore(
+              regenerateButton,
+              modalPostButton
+            );
+            // Adjust styling for the new position
+            regenerateButton.style.marginRight = "8px";
+            regenerateButton.style.marginTop = "0px";
+            regenerateButton.style.marginBottom = "0px";
+            regenerateButton.style.marginLeft = "0px"; // Ensure no other horizontal margins interfere
+            console.log(
+              "Quick GPT Reply: Regenerate button injected next to main reply button."
+            );
+          } else {
+            // Fallback to old placement if the expected container isn't found (should be rare)
+            console.warn(
+              "Quick GPT Reply: Could not find reply button container. Falling back to old placement for regenerate button."
+            );
+            const textareaParent = replyTextarea.parentElement;
+            if (textareaParent) {
+              textareaParent.insertAdjacentElement(
+                "afterend",
+                regenerateButton
+              );
+              regenerateButton.style.marginTop = "8px"; // Restore top margin for this fallback
+              console.log(
+                "Quick GPT Reply: Regenerate button injected (fallback placement)."
+              );
+            } else {
+              console.warn(
+                "Quick GPT Reply: Could not find textarea parent for fallback injection of regenerate button."
+              );
+            }
+          }
+        } else {
+          console.log("Quick GPT Reply: Regenerate button already exists.");
+        }
+        // --- END: Added for Task 12 (Regenerate Button UI) ---
       } else {
         console.warn(
           "Quick GPT Reply: Could not find post button in modal to check its state."
@@ -933,3 +988,306 @@ function mutationObserverCallback(mutationsList, observer) {
     }
   }
 }
+
+// --- START: Added for Task 12 (Regenerate Button UI) ---
+function createRegenerateButton(tweetModal, replyTextarea, originalTweetText) {
+  injectSpinnerStyles(); // Ensure spinner styles are available
+
+  const button = document.createElement("button");
+  button.className = "quick-gpt-regenerate-button";
+  button.setAttribute("data-original-tweet-text", originalTweetText); // Store original tweet for re-prompting
+
+  const buttonTextSpan = document.createElement("span");
+  buttonTextSpan.className = "quick-reply-button-text"; // Reuse class for consistency if desired
+  buttonTextSpan.textContent = "Regenerate";
+
+  const spinnerElement = document.createElement("span");
+  spinnerElement.className = "quick-reply-spinner"; // Reuse spinner
+  spinnerElement.style.display = "none";
+
+  button.appendChild(spinnerElement);
+  button.appendChild(buttonTextSpan);
+
+  // Styling - adjust as needed, make it distinct from main Quick Reply
+  button.style.cssText =
+    "padding: 4px 8px; border-radius: 16px; background-color: #1da1f2; color: white; border: none; cursor: pointer; font-size: 12px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;";
+
+  // Hover effect
+  button.addEventListener("mouseover", () => {
+    button.style.backgroundColor = "#0c85d0"; // Darker blue
+  });
+  button.addEventListener("mouseout", () => {
+    button.style.backgroundColor = "#1da1f2"; // Original blue
+  });
+
+  button.addEventListener("click", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    await handleRegenerateClick(
+      event,
+      tweetModal,
+      replyTextarea,
+      originalTweetText
+    );
+  });
+
+  return button;
+}
+
+async function handleRegenerateClick(
+  event,
+  tweetModal,
+  replyTextarea,
+  originalTweetText
+) {
+  const button = event.currentTarget;
+  const buttonTextSpan = button.querySelector(".quick-reply-button-text");
+  const spinnerElement = button.querySelector(".quick-reply-spinner");
+  const originalButtonText = buttonTextSpan
+    ? buttonTextSpan.textContent
+    : "Regenerate";
+  const originalButtonBackgroundColor = button.style.backgroundColor;
+
+  function resetButtonState() {
+    if (buttonTextSpan) {
+      buttonTextSpan.textContent = originalButtonText;
+      buttonTextSpan.style.display = "inline";
+    }
+    if (spinnerElement) spinnerElement.style.display = "none";
+    button.style.backgroundColor = originalButtonBackgroundColor;
+    button.disabled = false;
+  }
+
+  // Loading State Start
+  if (buttonTextSpan) buttonTextSpan.style.display = "none";
+  if (spinnerElement) spinnerElement.style.display = "inline-block";
+  button.disabled = true;
+
+  console.log(
+    "Quick GPT Reply: Regenerate button clicked. Original tweet:",
+    originalTweetText
+  );
+
+  // Placeholder for actually calling the generation logic
+  // In a real scenario, this would message the background script
+  // and then use injectReply or a similar mechanism to update the textarea.
+  try {
+    // Simulate API call delay
+    // await new Promise(resolve => setTimeout(resolve, 1500));
+    // const newReply = "This is a newly regenerated reply!";
+
+    // Send message to background script to get a new reply
+    chrome.runtime.sendMessage(
+      { action: "generateReply", tweetContent: originalTweetText }, // Re-use original tweet content
+      async (response) => {
+        // Made this callback async
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Quick GPT Reply (Regenerate): Error sending message:",
+            chrome.runtime.lastError.message
+          );
+          if (buttonTextSpan) buttonTextSpan.textContent = "Error";
+          button.style.backgroundColor = "#FF6B6B";
+          setTimeout(resetButtonState, 2000);
+          return;
+        }
+
+        if (response && response.success) {
+          console.log("Quick GPT Reply (Regenerate) received:", response.reply);
+          // Clear existing content of textarea before injecting new reply
+          if (replyTextarea) {
+            replyTextarea.focus();
+            await new Promise((r) => setTimeout(r, 100)); // Ensure focus
+
+            const selection = window.getSelection();
+            const range = document.createRange();
+            let clearedViaExec = false;
+            try {
+              range.selectNodeContents(replyTextarea);
+              selection.removeAllRanges();
+              selection.addRange(range);
+              await new Promise((r) => setTimeout(r, 50)); // Allow selection to process
+
+              console.log(
+                "Quick GPT Reply (Regenerate): Attempting to clear content via execCommand('delete')."
+              );
+              if (
+                document.queryCommandSupported &&
+                document.queryCommandSupported("delete")
+              ) {
+                clearedViaExec = document.execCommand("delete", false, null);
+              }
+
+              if (clearedViaExec) {
+                console.log(
+                  "Quick GPT Reply (Regenerate): Cleared textarea using execCommand('delete')."
+                );
+              } else {
+                console.warn(
+                  "Quick GPT Reply (Regenerate): execCommand('delete') failed or not supported for clearing. Trying manual clear by deleting selection."
+                );
+                // Fallback: if execCommand delete fails, manually clear the selection
+                if (
+                  selection.rangeCount > 0 &&
+                  selection.getRangeAt(0).toString() !== ""
+                ) {
+                  selection.deleteFromDocument();
+                  console.log(
+                    "Quick GPT Reply (Regenerate): Manually cleared selection via deleteFromDocument()."
+                  );
+                } else if (replyTextarea.innerHTML !== "") {
+                  // Last resort if selection is tricky
+                  replyTextarea.innerHTML = "";
+                  console.warn(
+                    "Quick GPT Reply (Regenerate): Cleared via innerHTML as final fallback."
+                  );
+                } else {
+                  console.log(
+                    "Quick GPT Reply (Regenerate): Textarea already appeared empty or selection clear failed."
+                  );
+                }
+              }
+            } catch (e) {
+              console.error(
+                "Quick GPT Reply (Regenerate): Error selecting/clearing content.",
+                e
+              );
+              // Fallback to a simple clear, though it might have issues.
+              replyTextarea.innerHTML = "";
+              console.warn(
+                "Quick GPT Reply (Regenerate): Fell back to innerHTML clearing due to error during selection/execCommand."
+              );
+            }
+
+            // Dispatch input event after clearing to notify React
+            replyTextarea.dispatchEvent(
+              new Event("input", { bubbles: true, cancelable: true })
+            );
+            console.log(
+              "Quick GPT Reply (Regenerate): Dispatched 'input' event after clearing attempt."
+            );
+            await new Promise((r) => setTimeout(r, 50)); // allow state to settle
+          }
+          // Re-use injectReply logic but only for pasting, not clicking reply again
+          // We need a more direct way to paste into the already open modal's textarea
+          await pasteTextIntoTextarea(replyTextarea, response.reply);
+          resetButtonState();
+        } else {
+          const errorMessage =
+            response?.error || "Unknown error regenerating reply.";
+          console.error(
+            "Quick GPT Reply (Regenerate): Failed to generate new reply:",
+            errorMessage
+          );
+          if (buttonTextSpan) buttonTextSpan.textContent = "Error";
+          button.style.backgroundColor = "#FF6B6B";
+          setTimeout(resetButtonState, 2000);
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Quick GPT Reply: Error during regeneration:", error);
+    if (buttonTextSpan) buttonTextSpan.textContent = "Error";
+    button.style.backgroundColor = "#FF6B6B";
+    setTimeout(resetButtonState, 2000);
+  }
+}
+
+// Helper to paste text, similar to what injectReply does but more direct
+async function pasteTextIntoTextarea(textarea, text) {
+  if (!textarea || typeof text === "undefined") {
+    console.error("Quick GPT Reply: Textarea or text missing for paste.");
+    return;
+  }
+  textarea.focus();
+  // Increased delay slightly to ensure focus and any subsequent selection changes settle
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  console.log(
+    "Quick GPT Reply (Regenerate): Attempting to paste using execCommand('insertText')."
+  );
+  let pastedSuccessfully = false;
+  try {
+    // Ensure the element is actually focused from the document's perspective.
+    if (document.activeElement !== textarea) {
+      console.warn(
+        "Quick GPT Reply (Regenerate): Textarea was not document.activeElement before execCommand. Refocusing."
+      );
+      textarea.focus();
+      await new Promise((resolve) => setTimeout(resolve, 50)); // Short delay after refocus
+    }
+
+    if (
+      document.queryCommandSupported &&
+      document.queryCommandSupported("insertText")
+    ) {
+      pastedSuccessfully = document.execCommand("insertText", false, text);
+      if (pastedSuccessfully) {
+        console.log(
+          "Quick GPT Reply (Regenerate): Pasted successfully using execCommand('insertText')."
+        );
+      } else {
+        console.warn(
+          "Quick GPT Reply (Regenerate): execCommand('insertText') returned false (element might not be focused or editable)."
+        );
+      }
+    } else {
+      console.warn(
+        "Quick GPT Reply (Regenerate): execCommand('insertText') is not supported by the browser."
+      );
+    }
+  } catch (e) {
+    console.error(
+      "Quick GPT Reply (Regenerate): Error during execCommand('insertText'):",
+      e
+    );
+    pastedSuccessfully = false; // Ensure it's false if an error occurred
+  }
+
+  if (!pastedSuccessfully) {
+    console.warn(
+      "Quick GPT Reply (Regenerate): Falling back to DataTransfer paste event method due to execCommand failure or non-support."
+    );
+    // This is the original problematic "Minimalist Paste"
+    try {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.setData("text/plain", text);
+      const pasteEvent = new ClipboardEvent("paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: dataTransfer,
+      });
+      textarea.dispatchEvent(pasteEvent);
+      console.log(
+        "Quick GPT Reply (Regenerate): Fallback paste event dispatched."
+      );
+      // If this path is taken, the known errors will likely re-occur.
+    } catch (e) {
+      console.error(
+        "Quick GPT Reply (Regenerate): Error during fallback DataTransfer paste:",
+        e
+      );
+      // Final fallback: direct manipulation (less ideal for rich text)
+      console.warn(
+        "Quick GPT Reply (Regenerate): Falling back to textContent assignment as last resort."
+      );
+      textarea.textContent = text; // This might mess up rich text formatting, but better than nothing.
+    }
+  }
+
+  // Always dispatch input and change events to notify React/frameworks
+  // Consider a small delay before these to let the paste action (execCommand or event) settle
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  textarea.dispatchEvent(
+    new Event("input", { bubbles: true, cancelable: true })
+  );
+  // 'change' event is often less critical immediately after programmatic input for some frameworks
+  // but can be dispatched for completeness.
+  textarea.dispatchEvent(
+    new Event("change", { bubbles: true, cancelable: true })
+  );
+  console.log(
+    "Quick GPT Reply (Regenerate): Final input/change events dispatched after paste attempt."
+  );
+}
+// --- END: Added for Task 12 (Regenerate Button UI) ---

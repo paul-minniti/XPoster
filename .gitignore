@@ -33,3 +33,5 @@ tasks/
 !README.md
 !src/
 !src/**/*
+!.github/
+!.github/**/*

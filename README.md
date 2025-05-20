@@ -67,8 +67,8 @@ Once installed, using Quick GPT Reply is super straightforward:
 1.  **Go to X.com (Twitter):** Open your web browser and navigate to [https://x.com](https://x.com).
 2.  **Find a Tweet:** Scroll through your timeline or find any tweet you'd like to reply to.
 3.  **Look for the "Quick Reply" Button:** You'll see a blue button labeled "Quick Reply" appear among the other action buttons (like reply, retweet, like) below the tweet.
-    ![Example of the Quick Reply button location (conceptual)](placeholder_image_quick_reply_button.png)
-    _(Developer Note: Replace `placeholder_image_quick_reply_button.png` with an actual screenshot URL or remove if not available.)_
+    <!-- ![Example of the Quick Reply button location (conceptual)](placeholder_image_quick_reply_button.png)
+    _(Developer Note: Replace `placeholder_image_quick_reply_button.png` with an actual screenshot URL or remove if not available.)_ -->
 4.  **Click "Quick Reply":**
     - The button will show a small spinning animation while it thinks of a reply.
     - The X.com reply window will open automatically.
