@@ -38,6 +38,7 @@ function validateApiKeyFormat(apiKey) {
   return openAiApiKeyRegex.test(apiKey);
 }
 
+
 /**
  * Tests the connection to OpenAI API using a given API key.
  * Makes a lightweight call to the /v1/models endpoint.
