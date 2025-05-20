@@ -1,0 +1,150 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f0f2f5;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align to top for forms that might grow */
+  min-height: 100vh;
+}
+
+.container {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+}
+
+h1 {
+  font-size: 24px;
+  color: #14171a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus,
+.form-group textarea:focus {
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.2);
+  outline: none;
+}
+
+.form-group small {
+  display: block;
+  font-size: 12px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.char-counter-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#charCounter {
+  font-size: 12px;
+  color: #555;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px;
+  margin-top: 25px;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.form-actions button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#saveSettings {
+  background-color: #1da1f2; /* Twitter blue */
+  color: white;
+}
+
+#saveSettings:hover {
+  background-color: #0c85d0;
+}
+
+#resetSettings,
+#testConnection {
+  background-color: #e1e8ed; /* Light grey */
+  color: #333;
+}
+
+#resetSettings:hover,
+#testConnection:hover {
+  background-color: #cdddec;
+}
+
+.status-message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  .form-actions button {
+    width: 100%;
+  }
+  .container {
+    padding: 20px 15px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+}

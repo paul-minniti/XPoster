@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick GPT Reply Settings</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Quick GPT Reply Settings</h1>
+
+      <form id="settingsForm">
+        <div class="form-group">
+          <label for="apiKey">OpenAI API Key</label>
+          <input
+            type="password"
+            id="apiKey"
+            name="apiKey"
+            placeholder="sk-..."
+            required
+          />
+          <small
+            >Enter your OpenAI API key. This is stored locally and never shared,
+            except with OpenAI.</small
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="systemPrompt">Custom System Prompt</label>
+          <textarea
+            id="systemPrompt"
+            name="systemPrompt"
+            rows="5"
+            placeholder="You are a helpful assistant that provides concise and witty replies for social media."
+          ></textarea>
+          <div class="char-counter-container">
+            <span id="charCounter">0</span>
+            <small
+              >Define the master behavior for the AI. Limited by browser
+              storage.</small
+            >
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="testConnection">Test Connection</button>
+          <button type="button" id="resetSettings">Reset to Defaults</button>
+          <button type="submit" id="saveSettings">Save Settings</button>
+        </div>
+      </form>
+      <div id="statusMessage" class="status-message"></div>
+    </div>
+    <script src="../storage.js" defer></script>
+    <script src="../validation.js" defer></script>
+    <script src="settings.js" defer></script>
+  </body>
+</html>
